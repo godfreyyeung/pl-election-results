@@ -1,6 +1,7 @@
 @import 'ember-paper';
+@import url('https://js.arcgis.com/4.10/esri/css/main.css');
 
-#election-results {
+#election-result-map {
     width: 600px;
     height: 400px;
 }

@@ -330,7 +330,7 @@ export default Component.extend({
           map: map,
           center: thisComponent["lngLat"] ? thisComponent["lngLat"] : [-110, 40],
           zoom: thisComponent["zoom"] ? thisComponent["zoom"] : 3,
-          container: thisComponent["id"]
+          container: thisComponent["elementId"]
         });
 
         // thisComponent.set('legend', new Legend({
