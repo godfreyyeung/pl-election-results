@@ -93,6 +93,39 @@ function createOperationalLayer(component, updatedLayer) {
 
 } // end createOperationalLayer()
 
+// update operational layer attributes.
+function redrawOperationalLayer(component, updatedLayer) {
+  let thisComponent = component,
+    existingLayer = thisComponent.get('existingLayers')[updatedLayer.id].layer;
+
+  if (existingLayer) {
+    if (updatedLayer.dataToJoin) {
+
+
+      let graphicsEdits = {
+        updateFeatures: []
+      }
+
+      let existingLayerFeatures = existingLayer.source.items;
+      let updatedData = updatedLayer.dataToJoin;
+      let joinField = updatedLayer.joinField;
+      let visualizationField = updatedLayer.visualizationField;
+
+      for (let i = 0; i < existingLayerFeatures.length; i++) {
+        let newValue = parseFloat(updatedData[existingLayerFeatures[i].attributes[joinField]][visualizationField]);
+        existingLayerFeatures[i].attributes[visualizationField] = newValue;
+        graphicsEdits.updateFeatures.push(existingLayerFeatures[i]);
+      }
+
+      let editPromise = existingLayer.applyEdits(graphicsEdits);
+
+      editPromise.then(function (result) {
+        console.log("DEC-MAP: Updated Op Layer '" + codifyString(updatedLayer.id) + "'");
+      })
+
+    }
+  }
+}
 
 // Enables click-to-select for any layers that have renderer.selectedSymbol assigned.
 // Also passes selected attribute data back up to calling context via its passed action.
@@ -212,43 +245,43 @@ function drawMapLayers(component) {
       return;
     }
 
-    let newLayerPromise;
-    newLayerPromise = createOperationalLayer(component, updatedLayer);
+    // if layer is already added to the map, update its attributes and redraw
+    if (thisComponent.get('existingLayers')[codifyString(updatedLayer.id)]) {
+      redrawOperationalLayer(thisComponent, updatedLayer);
+      // if layer is not yet added to map, add it. 
+    } else {
+      let newLayerPromise;
+      newLayerPromise = createOperationalLayer(component, updatedLayer);
 
-    newLayerPromise.then(function (newLayer) {
-      let newlyAddedLayer = {
-        layer: newLayer
-      }
+      newLayerPromise.then(function (newLayer) {
+        let newlyAddedLayer = {
+          layer: newLayer
+        }
 
-      if (updatedLayer.selectedSymbol) {
-        newlyAddedLayer.selectedSymbol = updatedLayer.selectedSymbol;
-      }
+        if (updatedLayer.selectedSymbol) {
+          newlyAddedLayer.selectedSymbol = updatedLayer.selectedSymbol;
+        }
 
-      if (updatedLayer.hoverSymbol) {
-        newlyAddedLayer.hoverSymbol = updatedLayer.hoverSymbol;
-      }
+        if (updatedLayer.hoverSymbol) {
+          newlyAddedLayer.hoverSymbol = updatedLayer.hoverSymbol;
+        }
 
-      // remove previous version of layer from map
-      if (thisComponent.get('existingLayers')[codifyString(updatedLayer.id)]) {
-        thisComponent.get('group').remove(thisComponent.get('existingLayers')[codifyString(updatedLayer.id)].layer);
-      }
+        // add new version of layer to map
+        thisComponent.get('group')
+          .add(newLayer,
+            (updatedLayer.index ? updatedLayer.index : Object.keys(thisComponent.get('existingLayers')).length)
+          );
 
-      // add new version of layer to map
-      thisComponent.get('group')
-        .add(newLayer,
-          (updatedLayer.index ? updatedLayer.index : Object.keys(thisComponent.get('existingLayers')).length)
-        );
+        // track new layer in existingLayers
+        thisComponent.get('existingLayers')[codifyString(updatedLayer.id)] = newlyAddedLayer;
 
-      // track new layer in existingLayers
-      thisComponent.get('existingLayers')[codifyString(updatedLayer.id)] = newlyAddedLayer;
+        // thisComponent.get('legend').layerInfos.push({
+        //   layer: newLayer,
+        //   title: updatedLayer.label
+        // });
 
-      // thisComponent.get('legend').layerInfos.push({
-      //   layer: newLayer,
-      //   title: updatedLayer.label
-      // });
-
-    }) // end newLayerPromise.then()
-
+      }) // end newLayerPromise.then()
+    }
   } // end for(updatedLayers)
 } // end drawMapLayers()
 
