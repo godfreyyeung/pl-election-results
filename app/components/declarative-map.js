@@ -56,10 +56,10 @@ function createOperationalLayer(component, updatedLayer) {
             });
             newGraphics.graphics.add(g);
           });
-          
+
           let modifiedFields = []
-          
-          for(let defaultField of defaultLayer.fields){
+
+          for (let defaultField of defaultLayer.fields) {
             modifiedFields.push(
               {
                 name: defaultField.name,
@@ -149,8 +149,8 @@ function initMapClickInteractions(component) {
 // TODO: perhaps hover functionality is passed in, instead?
 function initMapHoverInteractions(component) {
   let thisComponent = component,
-  Graphic = component.get('arcgisModules.Graphic.module'),
-  GraphicsLayer = component.get('arcgisModules.GraphicsLayer.module');
+    Graphic = component.get('arcgisModules.Graphic.module'),
+    GraphicsLayer = component.get('arcgisModules.GraphicsLayer.module');
 
   let hoverLayer = new GraphicsLayer({
     graphics: []
@@ -163,7 +163,7 @@ function initMapHoverInteractions(component) {
 
       // TODO: perhaps instead of recreating graphics from scratch, 
       // just replace one hoverGraphic's geometry with that the hovered graphic?
-      if(hoverLayer.graphics) hoverLayer.removeAll();
+      if (hoverLayer.graphics) hoverLayer.removeAll();
 
       for (let i = 0; i < response.results.length; i++) {
         let graphic = response.results[i].graphic;

@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = function(environment) {
+module.exports = function (environment) {
   let ENV = {
     modulePrefix: 'pl-election-results',
     environment,
@@ -71,7 +71,7 @@ module.exports = function(environment) {
           selectedSymbol: {
             type: "simple-fill",
             style: "solid",
-            color: [0,0,0,0],
+            color: [0, 0, 0, 0],
             outline: {
               color: "#674CE3",
               width: 3
