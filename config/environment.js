@@ -18,8 +18,73 @@ module.exports = function(environment) {
     },
 
     APP: {
-      // Here you can pass flags/options to your application instance
-      // when it is created
+      mapLayers: [
+        {
+          serviceUrl: 'https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/USA_States_Generalized/FeatureServer/0',
+          id: 'states',
+          label: 'States',
+          type: 'operational',
+          renderer: {
+            type: "unique-value",
+            field: "votePercent",
+            defaultSymbol: {
+              type: "simple-fill",
+              outline: {
+                width: 0.6,
+                color: "#528092"
+              }
+            },
+            visualVariables: [{
+              type: "color",
+              field: "votePercent",
+              stops: [
+                {
+                  value: 1,
+                  color: "#9AE4E8",
+                },
+                {
+                  value: 100,
+                  color: "#0B1C3D",
+                }
+              ]
+            }],
+            uniqueValueInfos: [{
+              value: "NaN",
+              symbol: {
+                type: "simple-fill",
+                style: "none",
+                outline: {
+                  color: "#888888",
+                  width: .6
+                }
+              }
+            }],
+          },
+          hoverSymbol: {
+            type: "simple-fill",
+            style: "none",
+            outline: {
+              color: "#735CE3",
+              width: 1.5
+            }
+          },
+          selectedSymbol: {
+            type: "simple-fill",
+            style: "solid",
+            color: [0,0,0,0],
+            outline: {
+              color: "#674CE3",
+              width: 3
+            }
+          },
+          dataToJoin: null,
+          visualizationField: "votePercent",
+          visualizationFieldType: "double",
+          joinField: "STATE_ABBR",
+          visible: true,
+          index: 2
+        }
+      ]
     }
   };
 
