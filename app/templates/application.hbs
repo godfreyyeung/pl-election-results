@@ -1,6 +1,26 @@
-{{declarative-map
-  id="election-result-map"
-  layers = layersWithData
-}}
-
-{{input value=someInput}}
+<div id="election-results-overlay" class="layout-row">
+  <div class="flex-20 election-results-sidepanel layout-column">
+    {{#paper-card 
+      class="flex-100 overflow-y"
+    as |card|}}
+      {{#card.header as |header|}}
+        {{#header.text as |text|}}
+          {{#text.title}}Election Results Explorer{{/text.title}}
+        {{/header.text}}
+      {{/card.header}}
+      {{#card.content}}
+        {{input value=someInput}}
+      {{/card.content}}
+    {{/paper-card}}
+  </div>
+  <div class="flex layout-column">
+    {{#paper-card
+      class="flex no-margin"
+    }}
+    {{declarative-map
+        id = "election-result-map"
+        layers = layersWithData
+      }}
+    {{/paper-card}}
+  </div>
+</div>
