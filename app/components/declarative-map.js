@@ -11,7 +11,7 @@ function codifyString(stringToCodify) {
 // Returns a promise that resolves to an operational layer created with client side graphics
 function createOperationalLayer(component, updatedLayer) {
 
-  console.log("DEC-MAP: returning Op Layer '" + updatedLayer.id + "'")
+  console.log("DEC-MAP: returning Op Layer '" + codifyString(updatedLayer.id) + "'")
 
   let thisComponent = component,
     FeatureLayer = thisComponent.get('arcgisModules.FeatureLayer.module'),
@@ -57,19 +57,7 @@ function createOperationalLayer(component, updatedLayer) {
             newGraphics.graphics.add(g);
           });
 
-          let modifiedFields = []
-
-          for (let defaultField of defaultLayer.fields) {
-            modifiedFields.push(
-              {
-                name: defaultField.name,
-                alias: defaultField.alias,
-                type: defaultField.type
-              }
-            );
-          }
-
-          modifiedFields.push({
+          defaultLayer.fields.push({
             name: visualizationField,
             alias: visualizationField,
             type: visualizationFieldType
@@ -79,7 +67,7 @@ function createOperationalLayer(component, updatedLayer) {
             id: codifyString(updatedLayer.id),
             title: updatedLayer.label,
             source: newGraphics.graphics,
-            fields: modifiedFields,
+            fields: defaultLayer.fields,
             geometryType: defaultLayer.geometryType
           });
 
@@ -162,7 +150,7 @@ function initMapHoverInteractions(component) {
     thisComponent._view.hitTest(event).then(function (response) {
 
       // TODO: perhaps instead of recreating graphics from scratch, 
-      // just replace one hoverGraphic's geometry with that the hovered graphic?
+      // just replace one hoverGraphic's geometry with that of the hovered graphic
       if (hoverLayer.graphics) hoverLayer.removeAll();
 
       for (let i = 0; i < response.results.length; i++) {
@@ -188,6 +176,12 @@ function initMapHoverInteractions(component) {
 
 } // end initLayerInteraction
 
+// TODO: (1) Explore storing reference of acquired graphics from service, to bypass 
+// pinging the service on each redraw. (Although Chrome does some caching of the service response)
+// (2) Explore using ArcGIS JS API's "renderer generator" pattern to rerender the choropleth. This requires 
+// attaching raw voting data to each state graphic when creating the layer. Then, on user input, 
+// dynamically generating a renderer with a 'valueExpression' equation based on the user's selection.
+// Finally, assign the new renderer to the layer without recreating the layer.
 function drawMapLayers(component) {
 
   let thisComponent = component;
@@ -206,57 +200,55 @@ function drawMapLayers(component) {
         updatedLayer.visible
       )
     ) {
-      console.log("DEC-MAP: You did not specify the required properties for layer '" + updatedLayer.id + "'. Check documentation.")
+      console.log("DEC-MAP: You did not specify the required properties for layer '" + codifyString(updatedLayer.id) + "'. Check documentation.")
       continue; // to next updatedLayer
     }
 
     if (
-      // ((updatedLayer.type == "operational") && !updatedLayer.uniqueIdField) ||
       ((updatedLayer.dataToJoin) && !updatedLayer.joinField) ||
       ((updatedLayer.dataToJoin) && !updatedLayer.visualizationField)
     ) {
-      console.log("DEC-MAP: You failed to specify required Operational Layer properties for the layer '" + updatedLayer.id + "'. Check documenation.")
+      console.log("DEC-MAP: You failed to specify required Operational Layer properties for the layer '" + codifyString(updatedLayer.id) + "'. Check documenation.")
       return;
     }
 
-    // if layer is already on the map, simply update its attributes
-    if (thisComponent.get('existingLayers')[codifyString(updatedLayer.id)]) {
-      // update it here 
+    let newLayerPromise;
+    newLayerPromise = createOperationalLayer(component, updatedLayer);
 
-      // if layer is not yet added to map, add it.
-    } else {
+    newLayerPromise.then(function (newLayer) {
+      let newlyAddedLayer = {
+        layer: newLayer
+      }
 
-      let newLayerPromise;
-      newLayerPromise = createOperationalLayer(component, updatedLayer);
+      if (updatedLayer.selectedSymbol) {
+        newlyAddedLayer.selectedSymbol = updatedLayer.selectedSymbol;
+      }
 
-      newLayerPromise.then(function (newLayer) {
-        let newlyAddedLayer = {
-          layer: newLayer
-        }
+      if (updatedLayer.hoverSymbol) {
+        newlyAddedLayer.hoverSymbol = updatedLayer.hoverSymbol;
+      }
 
-        if (updatedLayer.selectedSymbol) {
-          newlyAddedLayer.selectedSymbol = updatedLayer.selectedSymbol;
-        }
+      // remove previous version of layer from map
+      if (thisComponent.get('existingLayers')[codifyString(updatedLayer.id)]) {
+        thisComponent.get('group').remove(thisComponent.get('existingLayers')[codifyString(updatedLayer.id)].layer);
+      }
 
-        if (updatedLayer.hoverSymbol) {
-          newlyAddedLayer.hoverSymbol = updatedLayer.hoverSymbol;
-        }
+      // add new version of layer to map
+      thisComponent.get('group')
+        .add(newLayer,
+          (updatedLayer.index ? updatedLayer.index : Object.keys(thisComponent.get('existingLayers')).length)
+        );
 
-        thisComponent.get('existingLayers')[codifyString(updatedLayer.id)] = newlyAddedLayer;
+      // track new layer in existingLayers
+      thisComponent.get('existingLayers')[codifyString(updatedLayer.id)] = newlyAddedLayer;
 
-        thisComponent.get('group')
-          .add(newLayer,
-            (updatedLayer.index ? updatedLayer.index : Object.keys(thisComponent.get('existingLayers')).length)
-          );
+      // thisComponent.get('legend').layerInfos.push({
+      //   layer: newLayer,
+      //   title: updatedLayer.label
+      // });
 
-        // thisComponent.get('legend').layerInfos.push({
-        //   layer: newLayer,
-        //   title: updatedLayer.label
-        // });
+    }) // end newLayerPromise.then()
 
-      }) // end newLayerPromise.then()
-
-    } // end if(existingLayers[updatedLayer])
   } // end for(updatedLayers)
 } // end drawMapLayers()
 
