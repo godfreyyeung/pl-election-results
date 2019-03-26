@@ -7,11 +7,18 @@ export default Controller.extend({
   electionYears: null,
   stateCodes: null,
   politicalParties: null,
-  resultsByState: null,
+  resultsByYear: null,
 
-  electionYear: 2008,
-  friendlyParty: '',
-  opposingParty: '',
+  electionYear: 2004,
+  friendlyParty: 'Democratic',
+  opposingParty: 'Republican',
+
+  friendlyPartyOptions: computed('politicalParties', 'opposingParty', 'electionYear', function(){
+    return this.politicalParties[this.electionYear].filter(party => (party != this.opposingParty));
+  }),
+  opposingPartyOptions: computed('politicalParties', 'friendlyParty', 'electionYear', function(){
+    return this.politicalParties[this.electionYear].filter(party => (party != this.friendlyParty));
+  }),
 
   // assume each candidate has one and only one affiliated political party.
   pctVotesDiffsByState: computed('electionYear', 'friendlyParty', 'opposingParty', function () {
@@ -21,7 +28,8 @@ export default Controller.extend({
 
     for (let stateCode of thisCtrl.stateCodes) {
 
-      let curStateResults = thisCtrl.resultsByState[thisCtrl.electionYear + '_' + stateCode];
+      let curYearResults  = thisCtrl.resultsByYear[thisCtrl.electionYear];
+      let curStateResults = curYearResults[thisCtrl.electionYear + '_' + stateCode];
 
       let voteTotal = 0;
       let friendlyTotal = 0;
@@ -61,6 +69,18 @@ export default Controller.extend({
     }
 
     return layers;
-  })
+  }),
+
+  actions: {
+    setElectionYear(year) {
+      this.set('electionYear', year);
+    },
+    setFriendlyParty(party) {
+      this.set('friendlyParty', party);
+    },
+    setOpposingParty(party) {
+      this.set('opposingParty', party);
+    },
+  }
 
 });

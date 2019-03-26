@@ -15283,8 +15283,14 @@ export default Route.extend({
   setupController(controller, model){
     controller.set('electionYears', model.electionYears);
     controller.set('stateCodes', model.stateCodes);
-    controller.set('politicalParties', model.parties);
-    controller.set('resultsByState', model.results);
+
+    let partyValuesByYear = {
+      2004: Object.values(model.parties[2004]),
+      2008: Object.values(model.parties[2008]),
+      2012: Object.values(model.parties[2012]),
+    }
+    controller.set('politicalParties', partyValuesByYear);
+    controller.set('resultsByYear', model.results);
   }
 
 });

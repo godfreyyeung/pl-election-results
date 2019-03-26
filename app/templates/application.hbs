@@ -9,7 +9,35 @@
         {{/header.text}}
       {{/card.header}}
       {{#card.content}}
-        {{input value=someInput}}
+        <label class="control-label">Select election year</label>
+        {{#power-select
+          selected=electionYear
+          options=electionYears
+          onchange=(action "setElectionYear")
+          as |year|
+        }}
+          {{year}}
+        {{/power-select}}
+        <br>
+        <label>Select your party</label>
+        {{#power-select
+          selected=friendlyParty
+          options=friendlyPartyOptions
+          onchange=(action "setFriendlyParty")
+          as |partyOption|
+        }}
+          {{partyOption}}
+        {{/power-select}}
+        <br>
+        <label>Select opposing party</label>
+        {{#power-select
+          selected=opposingParty
+          options=opposingPartyOptions
+          onchange=(action "setOpposingParty")
+          as |partyOption|
+        }}
+          {{partyOption}}
+        {{/power-select}}
       {{/card.content}}
     {{/paper-card}}
   </div>
