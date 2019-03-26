@@ -141,12 +141,12 @@ module('Unit | Controller | application', function(hooks) {
     assert.ok(controller);
   });
 
-  test('pctVotesDiffByState computed property has correct calculations', function(assert) {
+  test('pctVotesDiffsByState computed property has correct calculations', function(assert) {
     let controller = this.owner.lookup('controller:application');
 
     controller.set('stateCodes', hooks.mockStates);
     controller.set('politicalParties', hooks.mockParties);
-    controller.set('resultsByState', hooks.mockParties);
+    controller.set('resultsByState', hooks.mockGivenYearResults);
     controller.set('electionYear', '2004');
     controller.set('friendlyParty', 'Independent');
     controller.set('opposingParty', 'Republican');
@@ -165,7 +165,7 @@ module('Unit | Controller | application', function(hooks) {
     let AK_republicanVotePct  = (AK_republicanVotes / AK_totalVotes)*100;
     let AK_votePctDiff        = AK_indepVotePct - AK_republicanVotePct;
 
-    let expectedpctVotesDiffByState = {
+    let expectedpctVotesDiffsByState = {
       "AL": {
         "votePctDiff": AL_votePctDiff
       },
@@ -174,7 +174,7 @@ module('Unit | Controller | application', function(hooks) {
       }
     }
 
-    assert.equal(JSON.stringify(controller.pctVotesDiffByState), JSON.stringify(expectedpctVotesDiffByState), 'pctVotesDiffByState CP gives expected values');
+    assert.equal(JSON.stringify(controller.pctVotesDiffsByState), JSON.stringify(expectedpctVotesDiffsByState), 'pctVotesDiffsByState CP gives expected values');
   });
 
 
