@@ -93,13 +93,19 @@ function createLayer(component, updatedLayer) {
 
 } // end createLayer()
 
-// update operational layer attributes.
-function redrawOperationalLayer(component, updatedLayer) {
+// update layer attributes.
+function redrawLayer(component, updatedLayer) {
+
   let thisComponent = component,
     existingLayer = thisComponent.get('existingLayers')[updatedLayer.id].layer;
 
   if (existingLayer) {
-    if (updatedLayer.dataToJoin) {
+
+    if (updatedLayer.visible != existingLayer.visible) {
+      existingLayer.visible = updatedLayer.visible;
+    }
+
+    if (updatedLayer.visible && updatedLayer.dataToJoin) {
 
       let graphicsEdits = {
         updateFeatures: []
@@ -122,9 +128,9 @@ function redrawOperationalLayer(component, updatedLayer) {
         console.log("DEC-MAP: Updated Op Layer '" + codifyString(updatedLayer.id) + "'");
       })
 
-    }
-  }
-}
+    } // end if(updatedLayer.visible && updatedLayer.dataToJoin)
+  } // end if (updatedLayer.visible != existingLayer.visible)
+} // end if (existingLayer)
 
 // Enables click-to-select for any layers that have renderer.selectedSymbol assigned.
 // Also passes selected attribute data back up to calling context via its passed action.
