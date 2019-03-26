@@ -26,7 +26,7 @@ module.exports = function (environment) {
           type: 'operational',
           renderer: {
             type: "unique-value",
-            field: "votePercent",
+            field: "votePctDiff",
             defaultSymbol: {
               type: "simple-fill",
               outline: {
@@ -36,15 +36,15 @@ module.exports = function (environment) {
             },
             visualVariables: [{
               type: "color",
-              field: "votePercent",
+              field: "votePctDiff",
               stops: [
                 {
-                  value: 1,
-                  color: "#9AE4E8",
+                  value: -25,
+                  color: "red",
                 },
                 {
-                  value: 100,
-                  color: "#0B1C3D",
+                  value: 25,
+                  color: "green",
                 }
               ]
             }],
@@ -60,25 +60,8 @@ module.exports = function (environment) {
               }
             }],
           },
-          hoverSymbol: {
-            type: "simple-fill",
-            style: "none",
-            outline: {
-              color: "#735CE3",
-              width: 1.5
-            }
-          },
-          selectedSymbol: {
-            type: "simple-fill",
-            style: "solid",
-            color: [0, 0, 0, 0],
-            outline: {
-              color: "#674CE3",
-              width: 3
-            }
-          },
           dataToJoin: null,
-          visualizationField: "votePercent",
+          visualizationField: "votePctDiff",
           visualizationFieldType: "double",
           joinField: "STATE_ABBR",
           visible: true,
