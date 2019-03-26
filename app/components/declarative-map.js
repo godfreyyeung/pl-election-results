@@ -132,88 +132,6 @@ function redrawLayer(component, updatedLayer) {
   } // end if (updatedLayer.visible != existingLayer.visible)
 } // end if (existingLayer)
 
-// Enables click-to-select for any layers that have renderer.selectedSymbol assigned.
-// Also passes selected attribute data back up to calling context via its passed action.
-// TODO: perhaps click functionality is passed in, instead?
-function initMapClickInteractions(component) {
-
-  let thisComponent = component,
-    Graphic = component.get('arcgisModules.Graphic.module');
-
-  thisComponent._view.on("click", function (event) {
-
-    thisComponent._view.hitTest(event.screenPoint).then(function (response) {
-
-      let clickedSelectionGraphics = response.results.filter(function (graphicObj, arr) {
-        return (graphicObj.graphic.attributes.graphicSelected) ? true : false;
-      })
-
-      thisComponent._view.graphics.removeAll();
-
-      if (clickedSelectionGraphics.length == 0) {
-        for (let i = 0; i < response.results.length; i++) {
-          let graphic = response.results[i].graphic;
-          let selectedSymbol = thisComponent.get('existingLayers')[graphic.sourceLayer.id].selectedSymbol;
-          if (selectedSymbol) {
-            let selectedGraphic = new Graphic({
-              geometry: graphic.geometry,
-              symbol: selectedSymbol,
-              attributes: Object.assign({ "graphicSelected": true }, graphic.attributes)
-            });
-
-            thisComponent._view.graphics.add(selectedGraphic);
-
-          }
-        }
-      }
-
-    });
-  });
-}
-
-// enables highlighting hovered features when.hoverSymbol is assigned
-// TODO: perhaps hover functionality is passed in, instead?
-function initMapHoverInteractions(component) {
-  let thisComponent = component,
-    Graphic = component.get('arcgisModules.Graphic.module'),
-    GraphicsLayer = component.get('arcgisModules.GraphicsLayer.module');
-
-  let hoverLayer = new GraphicsLayer({
-    graphics: []
-  });
-
-  thisComponent._view.map.add(hoverLayer);
-
-  thisComponent._view.on('pointer-move', function (event) {
-    thisComponent._view.hitTest(event).then(function (response) {
-
-      // TODO: perhaps instead of recreating graphics from scratch, 
-      // just replace one hoverGraphic's geometry with that of the hovered graphic
-      if (hoverLayer.graphics) hoverLayer.removeAll();
-
-      for (let i = 0; i < response.results.length; i++) {
-        let graphic = response.results[i].graphic;
-        let hoverSymbol = thisComponent.get('existingLayers')[graphic.sourceLayer.id].hoverSymbol;
-        if (hoverSymbol) {
-          let hoverGraphic = new Graphic({
-            geometry: graphic.geometry,
-            symbol: hoverSymbol,
-            attributes: graphic.attributes
-          });
-
-          hoverLayer.graphics.add(hoverGraphic);
-        }
-      }
-
-    });
-  });
-
-  thisComponent._view.on('pointer-leave', function (event) {
-    hoverLayer.removeAll();
-  });
-
-} // end initLayerInteraction
-
 function drawMapLayers(component) {
 
   let thisComponent = component;
@@ -380,9 +298,6 @@ export default Component.extend({
         thisComponent._view.map.add(thisComponent.get('group'));
 
         drawMapLayers(thisComponent);
-
-        initMapClickInteractions(thisComponent);
-        initMapHoverInteractions(thisComponent);
 
       });
 
