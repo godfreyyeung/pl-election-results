@@ -101,7 +101,6 @@ function redrawOperationalLayer(component, updatedLayer) {
   if (existingLayer) {
     if (updatedLayer.dataToJoin) {
 
-
       let graphicsEdits = {
         updateFeatures: []
       }
@@ -209,12 +208,6 @@ function initMapHoverInteractions(component) {
 
 } // end initLayerInteraction
 
-// TODO: (1) Explore storing reference of acquired graphics from service, to bypass 
-// pinging the service on each redraw. (Although Chrome does some caching of the service response)
-// (2) Explore using ArcGIS JS API's "renderer generator" pattern to rerender the choropleth. This requires 
-// attaching raw voting data to each state graphic when creating the layer. Then, on user input, 
-// dynamically generating a renderer with a 'valueExpression' equation based on the user's selection.
-// Finally, assign the new renderer to the layer without recreating the layer.
 function drawMapLayers(component) {
 
   let thisComponent = component;
@@ -230,7 +223,7 @@ function drawMapLayers(component) {
         updatedLayer.type &&
         updatedLayer.id &&
         updatedLayer.label &&
-        updatedLayer.visible
+        ((typeof updatedLayer.visible) == "boolean")
       )
     ) {
       console.log("DEC-MAP: You did not specify the required properties for layer '" + codifyString(updatedLayer.id) + "'. Check documentation.")
