@@ -8,8 +8,8 @@ function codifyString(stringToCodify) {
   return codifiedString;
 }
 
-// Returns a promise that resolves to an operational layer created with client side graphics
-function createOperationalLayer(component, updatedLayer) {
+// Returns a promise that resolves to a layer created with client side graphics
+function createLayer(component, updatedLayer) {
 
   console.log("DEC-MAP: returning Op Layer '" + codifyString(updatedLayer.id) + "'")
 
@@ -91,7 +91,7 @@ function createOperationalLayer(component, updatedLayer) {
 
   }); // end promise
 
-} // end createOperationalLayer()
+} // end createLayer()
 
 // update operational layer attributes.
 function redrawOperationalLayer(component, updatedLayer) {
@@ -234,17 +234,17 @@ function drawMapLayers(component) {
       ((updatedLayer.dataToJoin) && !updatedLayer.joinField) ||
       ((updatedLayer.dataToJoin) && !updatedLayer.visualizationField)
     ) {
-      console.log("DEC-MAP: You failed to specify required Operational Layer properties for the layer '" + codifyString(updatedLayer.id) + "'. Check documenation.")
+      console.log("DEC-MAP: You failed to specify required layer properties for the layer '" + codifyString(updatedLayer.id) + "'. Check documenation.")
       return;
     }
 
     // if layer is already added to the map, update its attributes and redraw
     if (thisComponent.get('existingLayers')[codifyString(updatedLayer.id)]) {
-      redrawOperationalLayer(thisComponent, updatedLayer);
+      redrawLayer(thisComponent, updatedLayer);
       // if layer is not yet added to map, add it. 
     } else {
       let newLayerPromise;
-      newLayerPromise = createOperationalLayer(component, updatedLayer);
+      newLayerPromise = createLayer(component, updatedLayer);
 
       newLayerPromise.then(function (newLayer) {
         let newlyAddedLayer = {
