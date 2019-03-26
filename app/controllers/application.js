@@ -5,6 +5,7 @@ import ENV from 'pl-election-results/config/environment';
 export default Controller.extend({
 
   electionYears:    null,
+  stateCodes: null,
   politicalParties: null,
   resultsByState:   null,
 
