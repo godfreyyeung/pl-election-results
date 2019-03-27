@@ -1,5 +1,9 @@
 # Election Results
 
+The app can be found at the following places:
+- [https://godfreyyeung.github.io/pl-election-results/](https://godfreyyeung.github.io/pl-election-results/)
+- [http://godfreyyeung.com/pl-election-results/](http://godfreyyeung.com/pl-election-results/)
+
 ## Assumptions
 
 This interactive visualization can be built in phases. Each phase
