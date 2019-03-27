@@ -15281,6 +15281,7 @@ export default Route.extend({
   },
 
   setupController(controller, model){
+    controller.set('userSubmittedResults', []);
     controller.set('electionYears', model.electionYears);
     controller.set('stateCodes', model.stateCodes);
 

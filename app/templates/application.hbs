@@ -1,15 +1,17 @@
 <div id="election-results-overlay" class="layout-row">
   <div class="flex-20 election-results-sidepanel layout-column">
     {{#paper-card 
-      class="flex-100 overflow-y"
+      class="flex-50 overflow-y"
     as |card|}}
       {{#card.header as |header|}}
         {{#header.text as |text|}}
-          {{#text.title}}Election Results Explorer{{/text.title}}
+          {{#text.title}}Explore Election Results{{/text.title}}
         {{/header.text}}
       {{/card.header}}
       {{#card.content}}
-        <label class="control-label">Select election year</label>
+        <label>
+          Select election year
+        </label>
         {{#power-select
           selected=electionYear
           options=electionYears
@@ -38,6 +40,42 @@
         }}
           {{partyOption}}
         {{/power-select}}
+      {{/card.content}}
+    {{/paper-card}}
+    {{#paper-card 
+      class="flex-50 overflow-y"
+    as |card|}}
+      {{#card.header as |header|}}
+        {{#header.text as |text|}}
+          {{#text.title}}Submit New Result{{/text.title}}
+        {{/header.text}}
+      {{/card.header}}
+      {{#card.content}}
+        <label class="control-label">Select result state</label>
+        {{#power-select
+          selected=newResultState
+          options=stateCodes
+          onchange=(action "setNewResultState")
+          as |stateCode|
+        }}
+          {{stateCode}}
+        {{/power-select}}
+        <br>
+        {{!-- Since the result may be for a future year, there is no known party domain --}}
+        <label>Enter a party</label>
+        {{input value=newResultCandidate maxlength=64}}
+        <br><br>
+        <label>Enter number of votes</label>
+        {{input type="number" value=newResultVotes min=0 max=100000000}}
+        <br><br>
+        <button {{action "submitVoteResult"}} disabled={{isSubmittingResult}}>
+          {{if isSubmittingResult "Please Wait..." "Submit"}}
+        </button>
+        <br><br>
+        <label>Submitted Results:</label>
+        <pre class="debug">
+          {{submittedResultsJSON}}
+        </pre>
       {{/card.content}}
     {{/paper-card}}
   </div>

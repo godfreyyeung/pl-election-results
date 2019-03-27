@@ -1,8 +1,38 @@
 import Controller from '@ember/controller';
 import { computed } from '@ember/object';
+import EmberObject from '@ember/object';
 import ENV from 'pl-election-results/config/environment';
 
+var voteResult = EmberObject.extend({
+  stateCode: '',
+  candidate: '',
+  votes: null
+});
+
+function fakeSubmitToServer(payload){
+  return new Promise(function(resolve, reject){
+    setTimeout(function(){
+      let newResultData = payload;
+      let newResult = voteResult.create(newResultData);
+      resolve(newResult);
+    }, 1200);
+  })
+}
+
 export default Controller.extend({
+
+  userSubmittedResults: null,
+
+  submittedResultsJSON: computed('userSubmittedResults.[]', function(){
+    let prettyJSON = JSON.stringify(this.userSubmittedResults, null, 2);
+    let withoutBrackets = prettyJSON.slice(0, -1).slice(1,prettyJSON.length);
+    return withoutBrackets;
+  }),
+
+  newResultState: null,
+  newResultCandidate: '',
+  newResultVotes: null,
+  isSubmittingResult: false,
 
   electionYears: null,
   stateCodes: null,
@@ -49,7 +79,7 @@ export default Controller.extend({
 
       let friendlyPct = (friendlyTotal / voteTotal)*100;
       let opposingPct = (opposingTotal / voteTotal)*100;
-      let pctDiff     = friendlyPct - opposingPct;
+      let pctDiff     = (friendlyPct - opposingPct).toFixed(2);
 
       diffsByState[stateCode] = { "votePctDiff": pctDiff };
 
@@ -81,6 +111,25 @@ export default Controller.extend({
     setOpposingParty(party) {
       this.set('opposingParty', party);
     },
+    setNewResultState(resultState) {
+      this.set('newResultState', resultState);
+    },
+    submitVoteResult(){
+      let thisCtrl = this;
+      if(!thisCtrl.isSubmittingResult){
+        let dataPayload = {
+          stateCode: thisCtrl.newResultState,
+          candidate: thisCtrl.newResultCandidate,
+          votes:     thisCtrl.newResultVotes
+        }
+        thisCtrl.set('isSubmittingResult', true);
+        fakeSubmitToServer(dataPayload).then((newResult) => {
+            thisCtrl.userSubmittedResults.pushObject(newResult);
+            thisCtrl.set('isSubmittingResult', false);
+          }
+        );
+      }
+    }
   }
 
 });
