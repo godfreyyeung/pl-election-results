@@ -50,4 +50,6 @@ The user story will be satisfied with...
 * `ember build` (development)
 * `ember build --environment production` (production)
 
-### Deploying
+### Targets
+
+IE11 is not included in the build targets.
